@@ -1,0 +1,21 @@
+baseURL = 'https://versollabs.com/'
+languageCode = 'en-us'
+title = 'Versol Labs'
+theme = 'paper'
+
+[params]
+  # appearance
+  color = 'linen'
+  monoDarkIcon = true  
+
+  # social
+  github = 'msolorio'
+  linkedin = 'michaelsolorio'
+
+  # home page profile
+  avatar = 'https://avatars.githubusercontent.com/u/11356322?v=4'
+  name = ' '
+  bio = 'Here is some info about me'
+
+
+  # misc
