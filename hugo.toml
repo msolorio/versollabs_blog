@@ -4,18 +4,33 @@ title = 'Versol Labs'
 theme = 'paper'
 
 [params]
-  # appearance
-  color = 'linen'
-  monoDarkIcon = true  
+# appearance
+color = 'linen'
+monoDarkIcon = true
 
-  # social
-  github = 'msolorio'
-  linkedin = 'michaelsolorio'
+# social
+github = 'msolorio'
+linkedin = 'michaelsolorio'
 
-  # home page profile
-  avatar = 'https://avatars.githubusercontent.com/u/11356322?v=4'
-  name = ' '
-  bio = 'Here is some info about me'
+# home page profile
+avatar = 'https://media.licdn.com/dms/image/v2/D5603AQH5V6XyACUP-A/profile-displayphoto-shrink_100_100/B56ZNpK_Z.GcAY-/0/1732636310359?e=1738195200&v=beta&t=74gv94OJ8bznwK81lSe03j8MEpVSEkdCsfCJCJerbRs'
+name = ' '
+bio = 'Here is my bio'
 
+# needed to  render raw HTML (e.g. <sub>, <sup>, <kbd>, <mark>)
+[markup]
+[markup.goldmark]
+[markup.goldmark.renderer]
+unsafe = false
+#  [markup.highlight]
+#    lineNos = true
 
-  # misc
+# [menu]
+
+#   [[menu.main]]
+#   identifier = "about"
+#   name = "About"
+#   url = "/about/"
+#   weight = 10
+
+# misc
