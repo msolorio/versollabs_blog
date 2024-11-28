@@ -1,0 +1,6 @@
+/* Place custom css here. */
+ :root {
+  /* link color in blog posts */
+   --custom-tw-prose-links: #2164ff;
+   --custom-tw-prose-invert-links: #79c4fa;
+ }

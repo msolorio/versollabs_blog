@@ -1,12 +1,12 @@
 baseURL = 'https://versollabs.com/'
 languageCode = 'en-us'
 title = 'Versol Labs'
-theme = 'paper'
+theme = 'my_paper_mod'
 
 [params]
 # appearance
 color = 'linen'
-monoDarkIcon = true
+# monoDarkIcon = true
 
 # social
 github = 'msolorio'
@@ -16,14 +16,15 @@ linkedin = 'michaelsolorio'
 avatar = 'https://media.licdn.com/dms/image/v2/D5603AQH5V6XyACUP-A/profile-displayphoto-shrink_100_100/B56ZNpK_Z.GcAY-/0/1732636310359?e=1738195200&v=beta&t=74gv94OJ8bznwK81lSe03j8MEpVSEkdCsfCJCJerbRs'
 name = ' '
 bio = 'Here is my bio'
+enableInlineShortcodes = true
 
 # needed to  render raw HTML (e.g. <sub>, <sup>, <kbd>, <mark>)
 [markup]
 [markup.goldmark]
 [markup.goldmark.renderer]
-unsafe = false
-#  [markup.highlight]
-#    lineNos = true
+unsafe = true
+[markup.highlight]
+style = 'github-dark'
 
 # [menu]
 
