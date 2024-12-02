@@ -6,16 +6,51 @@ title = 'Authenticating a Shopify app with Express.js'
 
 <!-- While building my Shopify backend application, one the first major tasks was configuring OAuth flow integration with Shopify.  -->
 
-What we've ended up with is a middleware library that provides a simple way to manage OAuth flow with Shopify and provide access to the Shopify Admin API. 
+While building the initial backbone of the Junta platform, one one the first major tasks was to collect data from common ecommerce solutions like Shopify and Google Ads. Our goal is to unify this data behind a single user-friendly product for the purpose of helping small businesses track trends and derive insight. Shopify, being a popular platform with a rich API for deriving insight from storefront data, made a good candidate to start.
+
+The Shopify dev team maintains the `shopify-app-js` tool suite, including [@shopify/shopify-api](https://github.com/Shopify/shopify-app-js/tree/main/packages/apps/shopify-api#readme), a framework and runtime agnostic library that hooks into Shopify's OAuth flow. I used this as the basis for building an Express middleware that I could use in the Junta project and my own scalable applications with Shopify.
+
+The result is a lightweight ExpressJS middleware library that makes it easy to manage OAuth with Shopify and stores access tokens for access to the [Shopify Admin API](https://shopify.dev/docs/api/admin-graphql).
+
 
 <!-- TODO:
 Show example client implementation for how the middleware should be used.
 Talk about how clean and easy to use the interface is and our reasoning for designing it the way we did.
  -->
 
+```ts
+import { ShopifyAuth, MongoDbSessionStore } from '@versollabs/shopify-auth-express';
+
+const app = express();
+app.use(bodyParser.json());
+
+const shopifyAuth = ShopifyAuth({ // Configure `ShopifyAuth`
+  api: {
+    apiKey: String(process.env.CLIENT_ID),
+    apiSecretKey: String(process.env.CLIENT_SECRET),
+    hostName: String(process.env.HOSTNAME),
+    scopes: ['read_products', 'read_orders'],
+  },
+  authPaths: {
+    begin: '/auth',
+    callback: '/auth/callback',
+  },
+  sessionStore: MongoDbSessionStore({ // Choose a session store (MongoDB, PostgreSQL, Redis)
+    url: String(process.env.MONGODB_URI),
+    dbName: 'shopify',
+    collectionName: 'shops',
+  }),
+});
+
+app.use(shopifyAuth.router()); // Use the router middleware in your Express app
+
+// Once storefront has installed your app call `getAccessToken` to get an access token for the store.
+const accessToken = await shopifyAuth.getAccessToken(storeName);
+```
+
 ---
 
-The entrypoint to the library exposes only two methods, encapsulating the complexity of OAuth flow management. One initializes the auth router to be used in the client's ExpressJS application and the other is for retrieving access tokens.
+<!-- The entrypoint to the library exposes only two methods, encapsulating the complexity of OAuth flow management. One initializes the auth router to be used in the client's ExpressJS application and the other is for retrieving access tokens. -->
 
 ```ts
 // src/index.ts
