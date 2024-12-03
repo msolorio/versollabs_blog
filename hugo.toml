@@ -20,6 +20,10 @@ avatar = 'https://media.licdn.com/dms/image/v2/D5603AQH5V6XyACUP-A/profile-displ
 name = ' '
 # name = 'Versol Labs Blog'
 bio = "Exploring concepts in software development."
+# name = 'Michael Solorio'
+name = ' '
+# name = 'Versol Labs Blog'
+bio = "Exploring concepts in software development."
 enableInlineShortcodes = true
 
 # needed to  render raw HTML (e.g. <sub>, <sup>, <kbd>, <mark>)
