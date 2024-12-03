@@ -1,10 +1,10 @@
 +++
 date = '2022-11-10T15:17:33-08:00'
 draft = false
-title = 'Grasping functional composition with TypeScript and fp-ts'
+title = 'Grasping function composition with TypeScript and fp-ts'
 +++
 
-I had the opportunity to work with <a href="https://gcanti.github.io/fp-ts/" target="_blank">fp-ts</a> on a couple of recent production projects at [Robin](https://robinpowered.com) that involved transformations and validations on data. fp-ts is a <a href="https://www.typescriptlang.org" target="_blank">TypeScript</a> library for providing popular patterns from typed functional languages like Scala and Haskell. Functional composition helped streamline operations on data and resulted in code that was surprisingly easy to reason about.
+I had the opportunity to work with <a href="https://gcanti.github.io/fp-ts/" target="_blank">fp-ts</a> on a couple of production projects at [Robin](https://robinpowered.com) that involved transformations and validations on data. fp-ts is a <a href="https://www.typescriptlang.org" target="_blank">TypeScript</a> library for providing popular patterns from typed functional languages like Scala and Haskell. Functional composition helped streamline operations on data and resulted in code that was surprisingly easy to reason about.
 
 The project culminated in a workshop I lead for the engineering department to share some of the team's learnings and open a discussion around other projects at the company that might benefit from some of these patterns.
 

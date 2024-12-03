@@ -1,4 +1,5 @@
 baseURL = 'https://versollabs.com/'
+# baseURL = 'https://versollabs-blog.pages.dev/'
 languageCode = 'en-us'
 title = 'Versol Labs'
 theme = 'my_paper_mod'
@@ -14,8 +15,10 @@ linkedin = 'michaelsolorio'
 
 # home page profile
 avatar = 'https://media.licdn.com/dms/image/v2/D5603AQH5V6XyACUP-A/profile-displayphoto-shrink_100_100/B56ZNpK_Z.GcAY-/0/1732636310359?e=1738195200&v=beta&t=74gv94OJ8bznwK81lSe03j8MEpVSEkdCsfCJCJerbRs'
-name = 'Michael Solorio'
-bio = 'Exploring concepts in software develpment.'
+# name = 'Michael Solorio'
+name = ' '
+# name = 'Versol Labs Blog'
+bio = "Exploring concepts in software development."
 enableInlineShortcodes = true
 
 # needed to  render raw HTML (e.g. <sub>, <sup>, <kbd>, <mark>)
@@ -33,5 +36,3 @@ style = 'github-dark'
 #   name = "About"
 #   url = "/about/"
 #   weight = 10
-
-# misc
