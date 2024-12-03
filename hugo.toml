@@ -1,4 +1,5 @@
-baseURL = 'https://versollabs.com/'
+# baseURL = 'https://versollabs.com/'
+baseURL = 'https://versollabs-blog.pages.dev/'
 languageCode = 'en-us'
 title = 'Versol Labs'
 theme = 'my_paper_mod'
