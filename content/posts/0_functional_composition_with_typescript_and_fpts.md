@@ -4,15 +4,15 @@ draft = false
 title = 'Grasping functional composition with TypeScript and fp-ts'
 +++
 
-I had the opportunity to work with <a href="https://gcanti.github.io/fp-ts/" target="_blank">fp-ts</a> on a couple of recent production projects that involved transformations and validations on data. fp-ts is a <a href="https://www.typescriptlang.org" target="_blank">TypeScript</a> library for providing popular patterns from typed functional languages like Scala and Haskell. Functional composition helped streamline operations on data and resulted in code that was surprisingly easy to reason about.
+I had the opportunity to work with <a href="https://gcanti.github.io/fp-ts/" target="_blank">fp-ts</a> on a couple of recent production projects at [Robin](https://robinpowered.com) that involved transformations and validations on data. fp-ts is a <a href="https://www.typescriptlang.org" target="_blank">TypeScript</a> library for providing popular patterns from typed functional languages like Scala and Haskell. Functional composition helped streamline operations on data and resulted in code that was surprisingly easy to reason about.
 
-The project culminated in a workshop I lead for the engineering department to share some of the team's learnings and open a discussion around other projects at the company that could benefit from these patterns.
+The project culminated in a workshop I lead for the engineering department to share some of the team's learnings and open a discussion around other projects at the company that might benefit from some of these patterns.
 
 I wanted to share out some of those learnings here for the wider community and the result is this compact primer.
 
 ---
 
-### Composition
+## Composition
 With functional composition, multiple functions are strung together in a sequence to create a larger function that has their combined behavior. Data can then be piped through that sequence; each function outputting the input to the next function.
 
 ```ts
@@ -63,11 +63,11 @@ getDoubleLength('apple') // => 10
 
 So far, our model of composition can be visualized by a set of railroad track pieces in a line.
 
-![function composition](/images/function-composition.png)
+![function composition](/images/0_functional_composition/function-composition.png)
 
 ---
 
-### Either
+## Either
 
 When composing functions there are times when a function may return an error, or may return one of two value types.
 
@@ -91,7 +91,7 @@ type Either<E, A> = Left<E> | Right<A>
 
 We might want to compose together many functions that return `Either`s.
 
-![function composition with eithers](/images/function-compostion-w-eithers.png)
+![function composition with eithers](/images/0_functional_composition/function-compostion-w-eithers.png)
 
 If the result of one function is of type `Right` pass the value to the next function. If the return value is of type `Left` exit the compostion and return early.
 
@@ -103,17 +103,17 @@ This is where `chain` comes in...
 
 ---
 
-### Chain
+## Chain
 
 Chain allows us to convert a one-to-two track function to a full two-track function.
 
-![chain function](/images/chain.png)
+![chain function](/images/0_functional_composition/chain.png)
 
 Chain converts a function from type `(a: A) => Either<E, B>` to a function of type `(ma: Either<E, A>) => Either<E, B>`. Put another way `chain` converts a function that accepts an unwrapped value to a function that accepts a value wrapped in an `Either`.
 
 Now that we have full two-track functions these can be composed properly.
 
-![chained function composition](/images/chained-function-composition.png)
+![chained function composition](/images/0_functional_composition/chained-function-composition.png)
 
 An example in fp-ts could use composition to check if a given user has a paid account, is a senior member, and has a number of pets between 1 and 10. If so return the user. Otherwise return an error.
 
@@ -134,7 +134,7 @@ Here are the sequence of events.
 1. If the `Either` is a `Left`, exit the composition with that `Left`.
 1. If the `Either` is a `Right`, the value is unwrapped and fed as input to `isSeniorMember`.
 
-![chained unwrapping](/images/chained-unwrapping.png)
+![chained unwrapping](/images/0_functional_composition/chained-unwrapping.png)
 
 <details>
   <summary><u>See the full code</u></summary>
@@ -206,11 +206,11 @@ const result = validateUser(user1)
 
 ---
 
-### Map
+## Map
 
 `map` is a utility similar to `chain`. It allows us to convert a full one-track function to a full two-track function.
 
-![map function](/images/map.png)
+![map function](/images/0_functional_composition/map.png)
 
 `map` converts a function of type `(a: A) => B` to a function of type `(fa: Either<E, A>) => Either<E, B>`. It converts a function that receives and returns an unwrapped value to a function that recieves and returns a value wrapped in an `Either`.
 
@@ -242,11 +242,11 @@ Here are the sequence of events.
 1. If the `Either` is a `Right`, the value is unwrapped and fed as input to `getPets`.
 1. The result of `getPets` is then wrapped in a `Right` and returned from the composition.
 
-![chain and map composition](/images/chain-and-map-composition.png)
+![chain and map composition](/images/0_functional_composition/chain-and-map-composition.png)
 
 ---
 
-### Further Reading
+## Further reading
 
 - <a href="https://gcanti.github.io/fp-ts/" target="_blank">fp-ts - docs</a>
 - <a href="https://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html" target="_blank">Functors, Applicatives, and Monads</a>

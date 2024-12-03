@@ -1,6 +1,32 @@
 /* Place custom css here. */
  :root {
   /* link color in blog posts */
-   --custom-tw-prose-links: #2164ff;
+   --custom-tw-prose-links: #0b7fd2;
    --custom-tw-prose-invert-links: #79c4fa;
+ }
+
+ .tableOfContents {
+   position: sticky;
+   top: 150px;
+   padding: 0;
+   margin-right: -450px;
+   width: 350px;
+   float: right;
+
+  h3 {
+    margin: 0;
+  }
+
+   ul {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  li {
+    margin-top: 0;
+    margin-bottom: 0;
+   }
+ }
+
+ .text-sm {
+    font-size: 1rem;
  }

@@ -49,7 +49,7 @@
   <span class="mb-1 inline-block text-xs tracking-wider text-orange-500">Featured</span>
   {{ end }}
   <h2 class="!my-0">{{ .Title }}</h2>
-  <time class="text-xs antialiased opacity-60">{{ .Date | time.Format ":date_medium" }}</time>
+  <time class="text-sm antialiased opacity-60">{{ .Date | time.Format ":date_medium" }}</time>
   <a class="absolute inset-0 text-[0]" href="{{ .Permalink }}">{{ .Title }}</a>
 </section>
 {{ end }}

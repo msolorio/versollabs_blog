@@ -1,11 +1,17 @@
 {{ define "main" }}
 
+
 <article>
+  <section class="tableOfContents">
+    <h3>Table of contents</h3>
+    {{ .TableOfContents }}
+  </section>
+
   <header class="mb-14">
     <h1 class="!my-0 pb-2.5">{{ .Title }}</h1>
 
     {{ if ne .Type "page" }}
-    <div class="text-xs antialiased opacity-60">
+    <div class="text-sm antialiased opacity-60">
       {{ if .Date }}
       <time>{{ .Date | time.Format ":date_medium" }}</time>
       {{ end }}<!---->
@@ -25,11 +31,8 @@
   {{ if .Params.tags }}
   <footer class="mt-12 flex flex-wrap">
     {{ range .Params.tags }} {{ $href := print (absURL "tags/") (urlize .) }}
-    <a
-      class="mb-1.5 ltr:mr-1.5 rtl:ml-1.5 rounded-lg bg-black/[3%] px-5 py-1 no-underline hover:bg-black/[6%] dark:bg-white/[8%] dark:hover:bg-white/[12%]"
-      href="{{ $href }}"
-      >{{ . }}</a
-    >
+    <a class="mb-1.5 ltr:mr-1.5 rtl:ml-1.5 rounded-lg bg-black/[3%] px-5 py-1 no-underline hover:bg-black/[6%] dark:bg-white/[8%] dark:hover:bg-white/[12%]"
+      href="{{ $href }}">{{ . }}</a>
     {{ end }}
   </footer>
   {{ end }}
@@ -39,17 +42,14 @@
   {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}<!---->
   {{ if and (gt (len $pages) 1) (in $pages . ) }}
   <nav
-    class="mt-24 flex overflow-hidden rounded-xl bg-black/[3%] text-lg !leading-[1.2] *:flex *:w-1/2 *:items-center *:p-5 *:font-medium *:no-underline dark:bg-white/[8%] [&>*:hover]:bg-black/[2%] dark:[&>*:hover]:bg-white/[3%]"
-  >
+    class="mt-24 flex overflow-hidden rounded-xl bg-black/[3%] text-lg !leading-[1.2] *:flex *:w-1/2 *:items-center *:p-5 *:font-medium *:no-underline dark:bg-white/[8%] [&>*:hover]:bg-black/[2%] dark:[&>*:hover]:bg-white/[3%]">
     {{ with $pages.Next . }}
-    <a class="ltr:pr-3 rtl:pl-3" href="{{ .Permalink }}"
-      ><span class="ltr:mr-1.5 rtl:ml-1.5">←</span><span>{{ .Name }}</span></a
-    >
+    <a class="ltr:pr-3 rtl:pl-3" href="{{ .Permalink }}"><span class="ltr:mr-1.5 rtl:ml-1.5">←</span><span>{{ .Name
+        }}</span></a>
     {{ end }}<!---->
     {{ with $pages.Prev . }}
-    <a class="ltr:ml-auto rtl:mr-auto justify-end pl-3" href="{{ .Permalink }}"
-      ><span>{{ .Name }}</span><span class="ltr:ml-1.5 rtl:mr-1.5">→</span></a
-    >
+    <a class="ltr:ml-auto rtl:mr-auto justify-end pl-3" href="{{ .Permalink }}"><span>{{ .Name }}</span><span
+        class="ltr:ml-1.5 rtl:mr-1.5">→</span></a>
     {{ end }}
   </nav>
   {{ end }}<!---->
@@ -106,11 +106,8 @@
   <!-- giscus comment -->
   {{ if and site.Params.giscus.repo (not (eq .Params.comments false)) }}
   <div class="giscus mt-24"></div>
-  <script
-    src="https://giscus.app/client.js"
-    data-repo="{{ site.Params.giscus.repo }}"
-    data-repo-id="{{ site.Params.giscus.repoId }}"
-    data-category="{{ site.Params.giscus.category }}"
+  <script src="https://giscus.app/client.js" data-repo="{{ site.Params.giscus.repo }}"
+    data-repo-id="{{ site.Params.giscus.repoId }}" data-category="{{ site.Params.giscus.category }}"
     data-category-id="{{ site.Params.giscus.categoryId }}"
     data-mapping="{{ site.Params.giscus.mapping | default (print `pathname`) }}"
     data-strict="{{ site.Params.giscus.strict | default (print `1`) }}"
@@ -119,10 +116,7 @@
     data-input-position="{{ site.Params.giscus.inputPosition | default (print `top`) }}"
     data-theme="{{ site.Params.giscus.theme | default (print `light`) }}"
     data-lang="{{ site.Params.giscus.lang | default (print `en`) }}"
-    data-loading="{{ site.Params.giscus.loading | default (print `lazy`) }}"
-    crossorigin="anonymous"
-    async
-  ></script>
+    data-loading="{{ site.Params.giscus.loading | default (print `lazy`) }}" crossorigin="anonymous" async></script>
   {{ end }}
 </article>
 

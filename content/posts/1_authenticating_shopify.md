@@ -10,9 +10,11 @@ The Shopify dev team maintains the `shopify-app-js` tool suite, including [@shop
 
 I used the `@shopify/shopify-api` library as the basis for building an Express middleware that I could use in the Junta project and my own projects that integrate with Shopify. The result is a lightweight ExpressJS library for non-embedded Shopify apps that makes it easy to manage OAuth and access to the [Shopify Admin API](https://shopify.dev/docs/api/admin-graphql).
 
-You can find the full code in [GitHub](https://github.com/msolorio/shopify-auth-express-middleware?tab=readme-ov-file#shopify-auth-express-middleware) and the library now [published on the npm registry]().
+You can find the full code in [GitHub](https://github.com/msolorio/shopify-auth-express-middleware?tab=readme-ov-file#shopify-auth-express-middleware) and the library [now published on the npm registry](https://www.npmjs.com/package/@versollabs/shopify-auth-express-middleware).
 
 ---
+
+## Client configuration
 
 One of my goals was to make the middleware easy to use and for setup, a client only needs to provide the necessary configuration options and then include the auth router in their app. The client configures the paths used for managing OAuth which we will discuss in depth further in this post, and can choose from a few built in options for token storage, passing the URL of their storage component.
 
@@ -50,7 +52,7 @@ const accessToken = await shopifyAuth.getAccessToken(storeName);
 
 ---
 
-## The Router
+## OAuth router
 
 The meat of this middleware library is the router. The router provides the ExpressJS application with two additional routes to handle OAuth flow, "begin" and "callback", and the paths for these routes are passed by the client application on initial configuration (`authPaths.begin` and `authPaths.callback`). The router class attaches them in the `create()` method and builds on Shopify's official API library, `@shopify/shopify-api`.
 
@@ -128,7 +130,7 @@ export class ShopifyAuthRouter {
 
 ---
 
-## OAuth Flow
+## OAuth flow in depth
 
 Let's take a more fine-grained look at the OAuth flow.
 
