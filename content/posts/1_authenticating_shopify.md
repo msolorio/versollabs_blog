@@ -6,19 +6,23 @@ title = 'Authenticating a Shopify app with Express.js'
 
 <!-- While building my Shopify backend application, one the first major tasks was configuring OAuth flow integration with Shopify.  -->
 
-While building the initial backbone of the Junta platform, one one the first major tasks was to collect data from common ecommerce solutions like Shopify and Google Ads. Our goal is to unify this data behind a single user-friendly product for the purpose of helping small businesses track trends and derive insight. Shopify, being a popular platform with a rich API for deriving insight from storefront data, made a good candidate to start.
+While building the initial backbone for another project, the Junta platform, one one the first major tasks was to collect data from common ecommerce solutions like Shopify and Google Ads. Our goal is to unify this data and expose behind a single user-friendly product for the purpose of helping small businesses track trends and derive insight. Shopify, being a popular platform with a rich API made a good candidate to start.
 
-The Shopify dev team maintains the `shopify-app-js` tool suite, including [@shopify/shopify-api](https://github.com/Shopify/shopify-app-js/tree/main/packages/apps/shopify-api#readme), a framework and runtime agnostic library that hooks into Shopify's OAuth flow. I used this as the basis for building an Express middleware that I could use in the Junta project and my own scalable applications with Shopify.
+The Shopify dev team maintains the `shopify-app-js` tool suite, including [@shopify/shopify-api](https://github.com/Shopify/shopify-app-js/tree/main/packages/apps/shopify-api#readme), a framework gnostic library for TypeScript or JavaScript backend apps to hook into Shopify's OAuth flow using [authorization code grant](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/authorization-code-grant). This package will allow a storefront owner to make varified requests to our application in order to approve our use of their storefront data.
 
-The result is a lightweight ExpressJS middleware library that makes it easy to manage OAuth with Shopify and stores access tokens for access to the [Shopify Admin API](https://shopify.dev/docs/api/admin-graphql).
+I used the `@shopify/shopify-api` library as the basis for building an Express middleware that I could use in the Junta project and my own projects that integrate with Shopify. The result is a lightweight ExpressJS middleware library for non-embedded Shopify apps that makes it easy to manage OAuth and access to the [Shopify Admin API](https://shopify.dev/docs/api/admin-graphql).
 
+You can find the full code in [GitHub]() and the library now [published on the npm registry]().
 
 <!-- TODO:
 Show example client implementation for how the middleware should be used.
 Talk about how clean and easy to use the interface is and our reasoning for designing it the way we did.
  -->
 
+A goal was to make the middleware easy use and for setup, a client only needs to provide the necessary configuration options and then include the auth router in their app. The client configures the paths used for managing OAuth flow, which we will discuss in depth in the next section, and can choose from a few built in options for token storage, passing the URL of their storage component.
+
 ```ts
+// example client implementation
 import { ShopifyAuth, MongoDbSessionStore } from '@versollabs/shopify-auth-express';
 
 const app = express();
@@ -44,48 +48,14 @@ const shopifyAuth = ShopifyAuth({ // Configure `ShopifyAuth`
 
 app.use(shopifyAuth.router()); // Use the router middleware in your Express app
 
-// Once storefront has installed your app call `getAccessToken` to get an access token for the store.
+// Once storefront has installed your app
+// call `getAccessToken` to get an access token for the store.
 const accessToken = await shopifyAuth.getAccessToken(storeName);
 ```
 
 ---
 
-<!-- The entrypoint to the library exposes only two methods, encapsulating the complexity of OAuth flow management. One initializes the auth router to be used in the client's ExpressJS application and the other is for retrieving access tokens. -->
-
-```ts
-// src/index.ts
-export const ShopifyAuth = function (options: ShopifyAuthOptions) {
-  return new _ShopifyAuth(options);
-}
-
-class _ShopifyAuth {
-  private _sessionStore: AbstractSessionStore;
-  private _authRouter: ShopifyAuthRouter;
-
-  constructor(options: ShopifyAuthOptions) {
-    this._sessionStore = options.sessionStore;
-    this._authRouter = new ShopifyAuthRouter({
-      api: options.api,
-      authPaths: options.authPaths,
-      sessionStore: this._sessionStore,
-      fakeShopifyApi: options.fakeShopifyApi,
-    })
-  }
-
-  public async getAccessToken(shopName: string) {
-    const shop = await this._sessionStore.get(shopName);
-    return String(shop && shop.accessToken);
-  }
-
-  public router() {
-    return this._authRouter.create();
-  }
-}
-```
-
----
-
-The meat of the middleware library is the router. This provides the client ExpressJS application with two additional routes to handle the OAuth flow with Shopify, the "begin" and "callback" routes. The router class attaches them in the `create()` method and builds on top of Shopify's official package, `@shopify/shopify-api`.
+The meat of the middleware library is the router. This provides the client ExpressJS application with two additional routes to handle the OAuth flow with Shopify, the "begin" and "callback" routes. These are the values passed by the client application on initial configuration (`authPaths.begin` and `authPaths.callback`) The router class attaches them in the `create()` method and hooks into Shopify's official API library, `@shopify/shopify-api`.
 
 ```ts
 import { shopifyApi } from '@shopify/shopify-api'
@@ -159,7 +129,13 @@ export class ShopifyAuthRouter {
 }
 ```
 
-The "begin" route is triggered when a Shopify storefront owner clicks to install our Shopify app. `this._shopify.auth.begin` (from Shopify's official package) will redirect the storefront owner to the Shopify Authentication screen, where they can approve the data from their store the app is requesting.
+A request is made to the "begin" route when a Shopify storefront owner clicks to install the client's Shopify app. This initial request to our app kicks off the OAuth flow and sends in query parameters, the name of the shop performing the install, the timestamp of the request, and an hmac signature.
+
+```bash
+GET /auth?hmac=14d14557a355757470aa16f46cee79a83b664a1d9cf43b32916810cbd60ba688&shop=versol-test3.myshopify.com&timestamp=1733180678
+```
+
+`this._shopify.auth.begin` will verify the request by passing the shop, the timestamp, and our client secret through the HMAC-SHA256 hash function and comparing it to the value of the hmac query parameter. If the request is valid the storefront owner will be redirected to the Shopify Authentication screen, where they can approve our app for accessing their storefront's data.
 
 ```ts
 ...
@@ -177,7 +153,13 @@ The "begin" route is triggered when a Shopify storefront owner clicks to install
 ...
 ```
 
-Once the merchant approves, Shopify will redirect them back to our app at the "callback" route with a temporary authorization grant. `this._shopify.auth.callback` completes the OAuth process by exchanging the temporary authorization grant for a permanent access token. We then persist the token in the session store where it can later be retrieved for access to the Shopify Admin API.
+Once the merchant approves, Shopify redirects them back to the app at the "callback" route and a temporary authorization code (`code`) is sent in the query parameter of the request.
+
+```bash
+GET /auth/callback?code=52798b42a28e84e856f8f2ca33e3eb65&hmac=43d5c6a79bfec24e6c3e8fa1feb01968a5f703e7c0eeddd05aacb775c5f279b1&host=YWRtaW4uc2hvcGlmeS5jb20vc3RvcmUvdmVyc29sLXRlc3Qz&shop=versol-test3.myshopify.com&state=882167157150937&timestamp=1733180679
+```
+
+`this._shopify.auth.callback` completes the OAuth process by making a request to Shopify's OAuth server to exchang the temporary authorization code for a permanent access token. We then persist the access token in the session store where it can later be retrieved for access to the Shopify Admin API.
 
 ```ts
 ...
@@ -197,10 +179,12 @@ Once the merchant approves, Shopify will redirect them back to our app at the "c
 
 ...
 ```
-<!-- 
-TODO:
-Show diagram of the OAuth flow with "begin" and "callback" routes
- -->
+
+The diagram below illustrates the full OAuth flow.
+
+![OAuth flow with authorization code grant](/images/1_authenticating_shopify/oauth_flow.png)
+
+---
 
 <!--
 TODO: talk about session stores and the reasoning behind them
@@ -215,16 +199,5 @@ TODO: Talk about NarrowedShopifyObject type
 - Allows for in memory testing of the library
 Type Narrowing ensures that our fake and the real shopify api object conform to the same specification.
  -->
-
-<!-- Identify the meat of what we're going to be talking about -->
-<!-- Giving an overview of the mdidleware library we created -->
-  <!-- Talk about motivation for creating library -->
-<!-- explain how auth with shopify api works under the hood -->
-  <!-- how OAuth 2.0 works -->
-
-<!-- - Go through the process of integrating express.js with Shopify to test auth (ngrok, shopify parterns dashboard) -->
-
-
-<!-- - At its core this library is a router that provides two additional routes auth flow with shopify -->
 
 <!-- discuss testing strategy -->
