@@ -1,6 +1,4 @@
 baseURL = 'https://versollabs.com/'
-# baseURL = 'https://versollabs-blog.pages.dev/'
-
 languageCode = 'en-us'
 title = 'Versol Labs'
 theme = 'my_paper_mod'
@@ -8,7 +6,7 @@ theme = 'my_paper_mod'
 [params]
 # appearance
 color = 'linen'
-# monoDarkIcon = true
+monoDarkIcon = false
 
 # social
 github = 'msolorio'
