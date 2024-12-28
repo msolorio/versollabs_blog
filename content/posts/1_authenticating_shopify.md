@@ -1,10 +1,10 @@
 +++
 date = '2024-11-24T15:17:33-08:00'
 draft = false
-title = 'Authenticating a Shopify app with ExpressJS'
+title = 'Managing OAuth flow with Shopify and ExpressJS'
 +++
 
-While I was building the initial backbone for the Junta platform, one of my first major initiatives was to collect storefront data from ecommerce solutions like Shopify and Google Ads. With Junta, our goal is to unify this data and expose behind a user-friendly product for helping small businesses track trends and derive insight. I decided Shopify, being a popular platform with a rich API made a good candidate to start.
+While building the initial backbone for the Junta platform, one of my first major initiatives was to collect storefront data from ecommerce solutions like Shopify and Google Ads. With Junta, our goal is to unify this data and expose behind a user-friendly product for helping small businesses track trends and derive insight. I decided Shopify, being a popular platform with a rich API made a good candidate to start.
 
 The Shopify dev team maintains the `shopify-app-js` tool suite, including [@shopify/shopify-api](https://github.com/Shopify/shopify-app-js/tree/main/packages/apps/shopify-api#readme), a framework agnostic library for TypeScript and JavaScript backend apps to hook into Shopify's OAuth flow using [authorization code grant](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/authorization-code-grant). This package will allow a storefront owner to make varified requests to our application in order to approve our use of their storefront data.
 
@@ -54,7 +54,7 @@ const accessToken = await shopifyAuth.getAccessToken(storeName);
 
 ## OAuth router
 
-The meat of this middleware library is the router. The router provides the ExpressJS application with two additional routes to handle OAuth flow, "begin" and "callback", and the paths for these routes are passed by the client application on initial configuration (`authPaths.begin` and `authPaths.callback`). The router class attaches them in the `create()` method and builds on Shopify's official API library, `@shopify/shopify-api`.
+The meat of this middleware library is the router. The router provides the ExpressJS application with two additional routes to handle OAuth flow, "begin" and "callback", and the paths for these routes are passed by the client application on initial configuration (`authPaths.begin` and `authPaths.callback`). The router class attaches them in the `create()` method and invokes methods from the `shopifyApi` module to hook into Shopify's OAuth flow.
 
 ```ts
 import { shopifyApi } from '@shopify/shopify-api'
@@ -130,17 +130,39 @@ export class ShopifyAuthRouter {
 
 ---
 
-## OAuth flow in depth
+## OAuth flow with Shopify in depth
 
-Let's take a more fine-grained look at the OAuth flow.
+Let's take a more fine-grained look at the OAuth flow with Shopify.
 
-A request is made to the "begin" route when a Shopify storefront owner clicks to install the client's Shopify app. This initial request to our app kicks off the OAuth flow and sends in query parameters, the name of the shop, the timestamp of the request, and an HMAC signature.
+When a Shopify merchant clicks to install the client's Shopify app they initialize the OAuth flow by sending a GET request to the "begin" route of the Express middleware. 
+
+This request contains within query parameters
+- the `shop` name
+- a `timestamp`
+- the origin `host` making the request Base64 encoded
+- and an `HMAC` signature.
 
 ```bash
-GET /auth?hmac=14d14557a355757470aa16f46cee79a83b664a1d9cf43b32916810cbd60ba688&shop=versol-test3.myshopify.com&timestamp=1733180678
+# initial begin request
+GET https://client-app/auth/shopify?hmac=907db6f3797d1c99d1f27fee7cd0a6ade97a46166ea9dfa2ba3fa388ab25fc08&host=YWRtaW4uc2hvcGlmeS5jb20vc3RvcmUvdmVyc29sLXRlc3Qz&shop=versol-test3.myshopify.com&timestamp=1735333786
 ```
 
-`this._shopify.auth.begin` will verify the request by passing the shop, the timestamp, and our client secret through the HMAC-SHA256 hash function and compare it to the value of the `hmac` query parameter. If the request is valid the storefront owner will be redirected to the Shopify Authentication screen, where they can approve our app for accessing their storefront's data for the scopes requested.
+The client app needs to verify the request being sent by the user and it does so by removing the hmac query parameter, passing the remaining parameters as a string along with the app's client ID through the HMAC-SHA256 hash function, and comparing the result of the hash function to the value of the hmac query parameter.
+
+If the request is valid, the client app generates a redirect URL to the Shopify's app consent screen, where the user will be asked to approve the app for access to their storefront data.
+
+```bash
+# example consent screen redirect URL
+GET https://admin.shopify.com/store/versol-test3/oauth/authorize?client_id=abc123456789&scope=read_products%2Creader_orders&redirect_uri=https%3A%2F%2Fexample.com%2Fauth%2Fshopify%2Fcallback&state=832550206527322
+```
+
+The consent screen redirect URL contains in query parameters
+- the `client_id` identifying the app
+- the API `scope`s the app is requesting access to
+- the `redirect_uri` to which the user is sent after authorizing the app
+- a `state` parameter unique for each authorization request which will be used for verification after the auth code is received
+
+The client app also sets a signed cookie to the value of the `state` parameter. The consent screen redirect URL generation and setting the cookie is managed by the `shopifyApi` module at `this._shopify.auth.begin`.
 
 ```ts
 ...
@@ -158,13 +180,31 @@ GET /auth?hmac=14d14557a355757470aa16f46cee79a83b664a1d9cf43b32916810cbd60ba688&
 ...
 ```
 
-Once the merchant approves, Shopify redirects them back to the app at the "callback" route and a temporary authorization code (`code`) is sent in the query parameter of the request.
+The merchant must authorize the app's use of their storefront data before OAuth flow can proceed.
+![Shopify app consent screen](/images/1_authenticating_shopify/shopify_consent_screen.png)
+
+After the merchant authorizes the client app, Shopify redirects the merchant to the `redirect_uri` that was passed earlier with the temporary authorization `code` passed as a query parameter. This `redirect_uri` is the "callback" route of the client app and starts the second phase of the OAuth flow. 
 
 ```bash
-GET /auth/callback?code=52798b42a28e84e856f8f2ca33e3eb65&hmac=43d5c6a79bfec24e6c3e8fa1feb01968a5f703e7c0eeddd05aacb775c5f279b1&host=YWRtaW4uc2hvcGlmeS5jb20vc3RvcmUvdmVyc29sLXRlc3Qz&shop=versol-test3.myshopify.com&state=882167157150937&timestamp=1733180679
+# request to the callback route containing the temporary code
+ GET https://client-app/auth/shopify/callback?code=80d4a45a44702ea84e59d5020f2f787f&hmac=dfd80e53fbe29af6d4f4fbb94eb74a4338a64d179e1cdc0b51aff74b1056b125&host=YWRtaW4uc2hvcGlmeS5jb20vc3RvcmUvdmVyc29sLXRlc3Qz&shop=versol-test3.myshopify.com&state=705654466948045&timestamp=1735337350
 ```
 
-`this._shopify.auth.callback` completes the OAuth process by making a request to Shopify's OAuth server to exchang the temporary authorization code for a permanent access token. We then persist the access token in the session store where it can later be retrieved for access to the Shopify Admin API.
+The client app again needs to verify the request being sent by the user.
+
+The client app
+- checks checks the `state` parameter is the same value that was originally sent.
+- checks that the signed cookie is present and matches the `state` parameter.
+- verifies the `hmac` parameter using the HMAC-SHA256 hash function.
+- verfies the `host` parameter after base64 decoding is a valid Shopify shop origin that ends in `.myshopify.com`.
+
+If all checks pass, the client app can now exchange the temporary `code` for a permenant access token by sending a request to the shop's access token endpoint.
+
+```bash
+POST https://merchants-shop.myshopify.com/admin/oauth/access_token?client_id=abc123456789&client_secret=987654321xyz&code=80d4a45a44702ea84e59d5020f2f787f
+```
+
+Verification and token exchange are managed by the `shopifyApi` module at `this._shopify.auth.callback` at the middleware's callback handler.
 
 ```ts
 ...
@@ -185,7 +225,7 @@ GET /auth/callback?code=52798b42a28e84e856f8f2ca33e3eb65&hmac=43d5c6a79bfec24e6c
 ...
 ```
 
-The diagram below illustrates the full OAuth flow.
+Here is the full OAuth flow with Shopify.
 
 ![OAuth flow with authorization code grant](/images/1_authenticating_shopify/oauth_flow.png)
 
