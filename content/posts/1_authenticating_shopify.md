@@ -16,11 +16,12 @@ You can find the full code in [GitHub](https://github.com/msolorio/shopify-auth-
 
 ## Client configuration
 
-One of my goals was to make the middleware easy to use and for setup, a client only needs to provide the necessary configuration options and then include the auth router in their app. The client configures the paths used for managing OAuth which we will discuss in depth further in this post, and can choose from a few built in options for token storage, passing the URL of their storage component.
+One of my goals was to make the middleware easy to use and for setup a client only needs to provide the necessary configuration options and then include the auth router in their app. The client configures the paths used for managing OAuth which we will discuss in depth further in this post. The client can pass their own behavior for managing access tokens or choose from a few built in options.
 
 ```ts
 // example client implementation
-import { ShopifyAuth, MongoDbSessionStore } from '@versollabs/shopify-auth-express';
+import { ShopifyAuth } from '@versollabs/shopify-auth-express';
+import { CustomSessionStore } from './custom-session-store';
 
 const app = express();
 app.use(bodyParser.json());
@@ -36,11 +37,8 @@ const shopifyAuth = ShopifyAuth({ // Configure `ShopifyAuth`
     begin: '/auth',
     callback: '/auth/callback',
   },
-  sessionStore: MongoDbSessionStore({ // Choose a session store (MongoDB, PostgreSQL, Redis)
-    url: String(process.env.MONGODB_URI),
-    dbName: 'shopify',
-    collectionName: 'shops',
-  }),
+  // add custom session store or choose an out of the box one for adding and retrieving access tokens
+  sessionStore: new CustomSessionStore(),
 });
 
 app.use(shopifyAuth.router()); // Use the router middleware in your Express app
@@ -48,6 +46,28 @@ app.use(shopifyAuth.router()); // Use the router middleware in your Express app
 // Once storefront has installed your app
 // call `getAccessToken` to get an access token for the store.
 const accessToken = await shopifyAuth.getAccessToken(storeName);
+```
+
+The client will likely want to provide their own behavior for managing access tokens. They can create a session storage object that implements the `AbstractSessionStore` interface and pass it to the `ShopifyAuth` constructor.
+
+```ts
+import { AbstractSessionStore } from '@versollabs/shopify-auth-express';
+
+class CustomSessionStore implements AbstractSessionStore {
+  async add(shopName: string): Promise<void> {
+    // Add access token to persistent storage
+  }
+
+  async get(shopName: string): Promise<string | null> {
+    // Get access token from your session store
+  }
+}
+
+const shopifyAuth = ShopifyAuth({
+  ...
+  sessionStore: new CustomSessionStore(),
+  ...
+});
 ```
 
 ---
@@ -231,12 +251,24 @@ Here is the full OAuth flow with Shopify.
 
 ---
 
-<!--
-TODO: talk about session stores and the reasoning behind them
-- Dependency inversion principle
-- Testing
-- Flexibility
--->
+## Dependency Inversion
+
+The library allows for passing access token management behavior to the middleware, decoupling it from a specific storage implementation.
+
+The dependency inversion principle states that high-level modules should not depend on low-level modules. Both should depend on abstractions. But what does this mean? In this case the low-level module is the mechanism for access token storage and retrieval. The high-level module is the middleware itself.
+
+The library defines the shape for how a session storage object should look and in doing so defines a contract for the middleware to interact with. A custom storage implementation can conform to this contract and the middleware need not know or care about the implementation details of session storage.
+
+Dependency inversion is useful because the client's needs for access token storage are likely to be specific to their architecture. In addition to allowing the library to be flexible, dependency inversion has the benefit of allowing the library to be easily tested. For unit testing we can pass a fake session storage object that implements the `AbstractSessionStore` interface, allowing us to run the majority of our tests in memory and therefor faster.
+
+![dependency inversion](/images/1_authenticating_shopify/dependency_inversion.png)
+
+---
+
+See the full code in GitHub and the library now published on the npm registry.
+
+https://github.com/msolorio/shopify-auth-express-middleware
+https://www.npmjs.com/package/@versollabs/shopify-auth-express-middleware
 
 <!-- 
 TODO: Talk about NarrowedShopifyObject type
@@ -244,5 +276,3 @@ TODO: Talk about NarrowedShopifyObject type
 - Allows for in memory testing of the library
 Type Narrowing ensures that our fake and the real shopify api object conform to the same specification.
  -->
-
-<!-- discuss testing strategy -->
