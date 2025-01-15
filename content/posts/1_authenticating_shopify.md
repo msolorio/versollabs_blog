@@ -264,7 +264,7 @@ The library defines the shape for how a session storage object should look and i
 
 Dependency inversion is useful because the client's needs for access token storage are likely to be specific to their architecture. In addition to allowing the library to be flexible, dependency inversion has the benefit of allowing the library to be easily tested. For unit testing we can pass a fake session storage object that implements the `AbstractSessionStore` interface, allowing us to run the majority of our tests in memory and therefor faster.
 
-![dependency inversion](/images/1_authenticating_shopify/dependency_inversion.png)
+![dependency inversion](/images/1_authenticating_shopify/dependency_inversion_1.png)
 
 ---
 
