@@ -6,11 +6,14 @@ title = 'Managing OAuth flow with Shopify and ExpressJS'
 
 While building the initial backbone for the Junta platform, one of my first major initiatives was to collect storefront data from ecommerce solutions like Shopify and Google Ads. With Junta, our goal is to unify this data and expose behind a user-friendly product for helping small businesses track trends and derive insight. I decided Shopify, being a popular platform with a rich API made a good candidate to start.
 
-The Shopify dev team maintains the `shopify-app-js` tool suite, including [@shopify/shopify-api](https://github.com/Shopify/shopify-app-js/tree/main/packages/apps/shopify-api#readme), a framework agnostic library for TypeScript and JavaScript backend apps to hook into Shopify's OAuth flow using [authorization code grant](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/authorization-code-grant). This package will allow a storefront owner to make varified requests to our application in order to approve our use of their storefront data.
+The Shopify dev team maintains the `shopify-app-js` tool suite, including [@shopify/shopify-api](https://github.com/Shopify/shopify-app-js/tree/main/packages/apps/shopify-api#readme), a framework agnostic library for TypeScript and JavaScript backend apps to hook into Shopify's OAuth flow using [authorization code grant](https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/authorization-code-grant). This package allows storefront owners to make varified requests to our application in order to approve our use of their storefront data.
 
 I used the `@shopify/shopify-api` library as the basis for building an Express middleware that I could use in the Junta project and my own projects that integrate with Shopify. The result is a lightweight ExpressJS library for non-embedded Shopify apps that makes it easy to manage OAuth and access to the [Shopify Admin API](https://shopify.dev/docs/api/admin-graphql).
 
+We'll take an overview of the library's design starting with its usage by a client, how it manages OAuth with Shopify, and discuss how dependency inversion is used to accommodate any number of client use-cases and improve testability.
+
 You can find the full code in [GitHub](https://github.com/msolorio/shopify-auth-express-middleware?tab=readme-ov-file#shopify-auth-express-middleware) and the library [now published on the npm registry](https://www.npmjs.com/package/@versollabs/shopify-auth-express-middleware).
+
 
 ---
 
@@ -251,7 +254,7 @@ Here is the full OAuth flow with Shopify.
 
 ---
 
-## Dependency Inversion
+## Dependency inversion
 
 The library allows for passing access token management behavior to the middleware, decoupling it from a specific storage implementation.
 

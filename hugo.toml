@@ -17,7 +17,7 @@ avatar = 'https://raw.githubusercontent.com/msolorio/versollabs_blog/refs/heads/
 # name = 'Michael Solorio'
 name = ' '
 # name = 'Versol Labs Blog'
-bio = "Exploring concepts in software development."
+bio = "Exploring concepts in software development and architecture."
 
 enableInlineShortcodes = true
 
