@@ -63,7 +63,7 @@ getDoubleLength('apple') // => 10
 
 So far, our model of composition can be visualized by a set of railroad track pieces in a line.
 
-![function composition](/images/0_functional_composition/function-composition.png)
+![function composition](/images/functional_composition/function-composition.png)
 
 ---
 
@@ -91,7 +91,7 @@ type Either<E, A> = Left<E> | Right<A>
 
 We might want to compose together many functions that return `Either`s.
 
-![function composition with eithers](/images/0_functional_composition/function-compostion-w-eithers.png)
+![function composition with eithers](/images/functional_composition/function-compostion-w-eithers.png)
 
 If the result of one function is of type `Right` pass the value to the next function. If the return value is of type `Left` exit the compostion and return early.
 
@@ -107,13 +107,13 @@ This is where `chain` comes in...
 
 Chain allows us to convert a one-to-two track function to a full two-track function.
 
-![chain function](/images/0_functional_composition/chain.png)
+![chain function](/images/functional_composition/chain.png)
 
 Chain converts a function from type `(a: A) => Either<E, B>` to a function of type `(ma: Either<E, A>) => Either<E, B>`. Put another way `chain` converts a function that accepts an unwrapped value to a function that accepts a value wrapped in an `Either`.
 
 Now that we have full two-track functions these can be composed properly.
 
-![chained function composition](/images/0_functional_composition/chained-function-composition.png)
+![chained function composition](/images/functional_composition/chained-function-composition.png)
 
 An example in fp-ts could use composition to check if a given user has a paid account, is a senior member, and has a number of pets between 1 and 10. If so return the user. Otherwise return an error.
 
@@ -134,7 +134,7 @@ Here are the sequence of events.
 1. If the `Either` is a `Left`, exit the composition with that `Left`.
 1. If the `Either` is a `Right`, the value is unwrapped and fed as input to `isSeniorMember`.
 
-![chained unwrapping](/images/0_functional_composition/chained-unwrapping.png)
+![chained unwrapping](/images/functional_composition/chained-unwrapping.png)
 
 <details>
   <summary><u>See the full code</u></summary>
@@ -210,7 +210,7 @@ const result = validateUser(user1)
 
 `map` is a utility similar to `chain`. It allows us to convert a full one-track function to a full two-track function.
 
-![map function](/images/0_functional_composition/map.png)
+![map function](/images/functional_composition/map.png)
 
 `map` converts a function of type `(a: A) => B` to a function of type `(fa: Either<E, A>) => Either<E, B>`. It converts a function that receives and returns an unwrapped value to a function that recieves and returns a value wrapped in an `Either`.
 
@@ -242,7 +242,7 @@ Here are the sequence of events.
 1. If the `Either` is a `Right`, the value is unwrapped and fed as input to `getPets`.
 1. The result of `getPets` is then wrapped in a `Right` and returned from the composition.
 
-![chain and map composition](/images/0_functional_composition/chain-and-map-composition.png)
+![chain and map composition](/images/functional_composition/chain-and-map-composition.png)
 
 ---
 
