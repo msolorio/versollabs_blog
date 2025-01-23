@@ -262,7 +262,7 @@ The dependency inversion principle states that high-level modules should not dep
 
 The library defines the shape for how a session storage object should look and in doing so defines a contract for the middleware to interact with. A custom storage implementation can conform to this contract and the middleware need not know or care about the implementation details of session storage.
 
-Dependency inversion is useful here because the client's needs for access token storage are likely to be specific to their architecture. In addition to allowing the library to be flexible, dependency inversion has the benefit of allowing the library to be easily tested. By creating an abstraction around low-level data access, and passing a fake session storage object, we can get to a point where the majority of our tests are fast, in-memory unit tests. We can spead up iteration speeds and get feedback early and often.
+Dependency inversion is useful here because the client's needs for access token storage are likely to be specific to their architecture. In addition to allowing the library to be flexible, dependency inversion has the benefit of allowing the library to be easily tested. By creating an abstraction around low-level data access, and passing a fake session storage object, we can get to a point where the majority of our tests are fast, in-memory unit tests. With a healthy [testing pyramid](https://martinfowler.com/articles/practical-test-pyramid.html) we can spead up iteration speeds and get feedback early and often.
 
 ![dependency inversion](/images/1_authenticating_shopify/dependency_inversion_1.png)
 
