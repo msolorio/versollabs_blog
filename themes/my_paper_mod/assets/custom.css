@@ -1,6 +1,7 @@
 /* Place custom css here. */
  :root {
   /* link color in blog posts */
+  font-size: 16px;
    --custom-tw-prose-links: #0b7fd2;
    --custom-tw-prose-invert-links: #79c4fa;
  }
@@ -9,8 +10,8 @@
    position: sticky;
    top: 150px;
    padding: 0;
-   margin-right: -450px;
-   width: 350px;
+   margin-right: -360px;
+   width: 315px;
    float: right;
 
   h3 {
