@@ -1,24 +1,54 @@
 +++
-date = '2025-01-22T15:17:33-08:00'
+date = '2025-01-23T17:44:47-08:00'
 draft = true
-title = 'HTTP caching with the Cache-Control header'
+title = "Pushing performance with HTTP's Cache-Control header"
 +++
 
-Recently I've wanted to dive deeper into the various ways caching can be used to improve the performance of an application. With this post I wanted to share how the Cache-Control header and other related mechanisms can be used to take advantage of HTTP's native caching features to reduce server load and response times as an application begins to scale.
+<!-- TODO: potentially rework intro -->
+Have you ever wondered why some applications feel lightning-fast, while others lag behind? The secret often lies in how effectively they use caching. In this post I'll discuss how HTTP's Cache-Control header and other related mechanisms can be used to take advantage of HTTP's native caching features. This will allow us to reduce server load and response times as an application begins to scale.
+
+The [REST architectural style](), as defined by Roy Fielding, makes caching one of its key constraints. REST API's are stateless, meaning each request is independent of every other request. This enables us to effectively cache the return data for GET requests on the client, granted the cache can be updated at appropreate times. But how does the server decide what gets cached and for how long? That's where response headers, like Cache-Control, come into play.
+
+---
 
 ## The Cache-Control Header
 
-Walk through client/server request/response flow with the Cache-Control header.
+We'll start by walking through an example request flow with the Cache-Control header and then we'll build from there.
 
-Show diagram
+### Serving from cache
+
+The flow starts with the client making a `GET` request for data. The server responds with a `200 OK` status, the JSON data in the body of the request, and a `Cache-Control` header indicating the age of the cache, in this case 3600 milliseconds (1 hour).
+
+```bash
+GET /api/data
+```
+```bash
+200 OK
+Cache-Control: max-age=3600
+Content-Type: aplication/json
+{ "data": "content" }
+```
+The client stores in its local cache the data for the endpoint and the age of the cache.
+
+When the client makes a GET request for the same endpoint and the cache has not yet expired, the response data is served locally from its cache. We avoid making a roundtrip request to the server, significantly reducing latency and bandwidth on the application. This storing and serving from cache is part of the HTTP protocol, and is enacted by the browser when it receives the Cache-Control header.
+
+### Cache expiration
+
+After a full hour passes the cache becomes stale. If the client makes another GET request to the same endpoint the browser will force a request to the server. The return data and the cache age is again used to populate the cache.
+
+<!-- TODO - insert image -->
+![Request flow for the Cache-Control header]()
 
 ## Further optimizations with the ETag and Last-Modified headers
+keyword: Conditional request
 
 Walk through client/server request/response flow with the Cache-Control header and with both ETag and Last-Modified.
 
 ## Library and framework implementations
 
 Explain how Express sets ETag headers automatically.
+
+different hashing algorithms
 
 ## Use case considerations
 
