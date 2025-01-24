@@ -5,7 +5,7 @@ theme = 'my_paper_mod'
 
 [params]
 # appearance
-color = 'linen'
+color = 'dark'
 monoDarkIcon = false
 
 # social
