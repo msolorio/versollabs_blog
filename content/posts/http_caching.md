@@ -4,7 +4,7 @@ draft = false
 title = "Pushing performance with HTTP's Cache-Control header"
 +++
 
-Recently, I've wanted to dive deeper into the various ways caching can be used to improve the performance of an application. In this post I'll discuss how HTTP's `Cache-Control` header and other related mechanisms can be used to take advantage of HTTP's native caching features. This will allow us to reduce server load and response times as an application begins to scale.
+In this post I want to explore how HTTP's native caching features can be used to reduce server load and response times for users as an application begins to scale.
 
 The [REST architectural style](), as defined by Roy Fielding, makes caching one of its key constraints. With REST APIs being stateless each request is independent of every other request, enabling us to effectively cache the return data for GET requests on the client, provided that the cache can be updated at appropriate times. But how does the server decide what gets cached and for how long? That's where response headers like `Cache-Control` come into play.
 
