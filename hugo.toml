@@ -1,4 +1,4 @@
-baseURL = 'https://versollabs.com/'
+baseURL = 'https://blog.versollabs.com/'
 languageCode = 'en-us'
 title = 'Versol Labs'
 theme = 'my_paper_mod'
@@ -13,7 +13,7 @@ github = 'msolorio'
 linkedin = 'michaelsolorio'
 
 # home page profile
-avatar = 'https://raw.githubusercontent.com/msolorio/versollabs_blog/refs/heads/main/down_jacket_cropped.jpg'
+# avatar = 'https://raw.githubusercontent.com/msolorio/versollabs_blog/refs/heads/prod/kitchen_grey_shirt_cropped.jpg'
 # name = 'Michael Solorio'
 name = ' '
 # name = 'Versol Labs Blog'
