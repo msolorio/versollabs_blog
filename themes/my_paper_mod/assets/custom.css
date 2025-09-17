@@ -31,3 +31,7 @@
  .text-sm {
     font-size: 1rem;
  }
+
+ .logo-light, .logo-dark {
+  width: 200px;
+ }

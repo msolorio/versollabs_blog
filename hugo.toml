@@ -8,6 +8,10 @@ theme = 'my_paper_mod'
 color = 'dark'
 monoDarkIcon = false
 
+# logo configuration
+logoLight = 'images/versol-labs-logo-light.svg'
+logoDark = 'images/versol-labs-logo-dark.svg'
+
 # social
 github = 'msolorio'
 linkedin = 'michaelsolorio'
@@ -15,8 +19,8 @@ linkedin = 'michaelsolorio'
 # home page profile
 # avatar = 'https://raw.githubusercontent.com/msolorio/versollabs_blog/refs/heads/prod/kitchen_grey_shirt_cropped.jpg'
 # name = 'Michael Solorio'
-name = ' '
-# name = 'Versol Labs Blog'
+# name = ' '
+name = 'Versol Labs Blog'
 bio = "Exploring concepts in software development and architecture."
 
 enableInlineShortcodes = true
