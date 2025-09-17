@@ -1,6 +1,19 @@
 <header class="mx-auto flex h-[4.5rem] max-w-[--w] px-8 lg:justify-center">
   <div class="relative z-50 ltr:mr-auto rtl:ml-auto flex items-center">
-    <a class="-translate-y-[1px] text-2xl font-medium" href="{{ `` | absURL }}">{{ site.Title }}</a>
+    <a class="-translate-y-[1px] flex items-center" href="{{ `` | absURL }}">
+      <img 
+        src="{{ site.Params.logoLight | absURL }}" 
+        alt="{{ site.Title }}" 
+        class="h-8 w-auto logo-light"
+        style="display: block;"
+      />
+      <img 
+        src="{{ site.Params.logoDark | absURL }}" 
+        alt="{{ site.Title }}" 
+        class="h-8 w-auto logo-dark"
+        style="display: none;"
+      />
+    </a>
   </div>
 
   <div
@@ -59,6 +72,19 @@
     metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
     htmlClass[isDark ? 'add' : 'remove']('dark');
     localStorage.setItem('dark', isDark);
+    
+    // Toggle logo visibility
+    const logoLight = document.querySelector('.logo-light');
+    const logoDark = document.querySelector('.logo-dark');
+    if (logoLight && logoDark) {
+      if (isDark) {
+        logoLight.style.display = 'none';
+        logoDark.style.display = 'block';
+      } else {
+        logoLight.style.display = 'block';
+        logoDark.style.display = 'none';
+      }
+    }
   };
 
   // init
