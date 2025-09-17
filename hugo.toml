@@ -1,12 +1,13 @@
 baseURL = 'https://blog.versollabs.com/'
 languageCode = 'en-us'
-title = 'Versol Labs'
+title = 'Versol Labs Blog'
 theme = 'my_paper_mod'
 
 [params]
 # appearance
 color = 'dark'
 monoDarkIcon = false
+favicon = 'images/versol-labs-favicon.png'
 
 # logo configuration
 logoLight = 'images/versol-labs-logo-light.svg'
